@@ -2,7 +2,7 @@
   "name": "Querido Hub",
   "short_name": "Querido Hub",
   "description": "Central de aplicativos Querido",
-  "start_url": "/",
+  "start_url": "/go.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
