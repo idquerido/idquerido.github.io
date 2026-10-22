@@ -1,0 +1,18 @@
+{
+  "name": "Querido Hub",
+  "short_name": "Querido Hub",
+  "description": "Central de aplicativos Querido",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#358888",
+  "icons": [
+    {
+      "src": "/icons/querido-hub-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
