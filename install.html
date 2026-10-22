@@ -17,14 +17,9 @@
     strong{color:#111}
   </style>
   <script>
-    (function(){
-      var key='querido-hub-safari-bookmark-v1';
-      if (localStorage.getItem(key)==='ready') {
-        window.location.replace("https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec");
-        return;
-      }
-      localStorage.setItem(key,'ready');
-    })();
+    window.addEventListener('DOMContentLoaded', function () {
+      history.replaceState(null, '', '/go.html');
+    });
   </script>
 </head>
 <body>
