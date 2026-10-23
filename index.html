@@ -8,14 +8,16 @@
 
   <link rel="icon" type="image/png" sizes="180x180" href="/icons/querido-hub-oficial-v2-180.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/querido-hub-oficial-v2-180.png">
+  <link rel="manifest" href="/manifest.webmanifest">
 
   <script>
     (function () {
       var ua = navigator.userAgent || '';
       var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      var isAndroid = /Android/i.test(ua);
 
-      if (!isIOS) {
+      if (!isIOS && !isAndroid) {
         window.location.replace("https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec");
       }
     })();
@@ -54,8 +56,9 @@
       var ua = navigator.userAgent || '';
       var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      var isAndroid = /Android/i.test(ua);
 
-      if (isIOS) {
+      if (isIOS || isAndroid) {
         history.replaceState(null, '', '/go.html');
       }
     });
