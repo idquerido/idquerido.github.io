@@ -57,9 +57,27 @@
       var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       var isAndroid = /Android/i.test(ua);
+      var appUrl = "https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec";
 
-      if (isIOS || isAndroid) {
+      if (isIOS) {
         history.replaceState(null, '', '/go.html');
+      }
+
+      if (isAndroid) {
+        var saiuDaPagina = false;
+
+        history.replaceState(null, '', '/go.html');
+
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'hidden') {
+            saiuDaPagina = true;
+            return;
+          }
+
+          if (saiuDaPagina && location.pathname === '/go.html') {
+            window.location.replace(appUrl);
+          }
+        });
       }
     });
   </script>
