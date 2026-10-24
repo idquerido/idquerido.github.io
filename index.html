@@ -66,18 +66,45 @@
 
       if (isAndroid) {
         history.replaceState(null, '', '/go.html');
-      }
 
-      if (isAndroid || isChromeIOS) {
-        var saiuDaPagina = false;
+        var saiuDaPaginaAndroid = false;
+
+        function redirecionarAndroidSeRetornou() {
+          if (
+            saiuDaPaginaAndroid &&
+            !document.hidden &&
+            location.pathname === '/go.html'
+          ) {
+            window.location.replace(appUrl);
+          }
+        }
 
         document.addEventListener('visibilitychange', function () {
           if (document.visibilityState === 'hidden') {
-            saiuDaPagina = true;
+            saiuDaPaginaAndroid = true;
             return;
           }
 
-          if (saiuDaPagina && location.pathname === '/go.html') {
+          redirecionarAndroidSeRetornou();
+        });
+
+        window.addEventListener('pageshow', redirecionarAndroidSeRetornou);
+        window.addEventListener('focus', redirecionarAndroidSeRetornou);
+        document.addEventListener('resume', redirecionarAndroidSeRetornou);
+
+        window.setInterval(redirecionarAndroidSeRetornou, 500);
+      }
+
+      if (isChromeIOS) {
+        var saiuDaPaginaChromeIOS = false;
+
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'hidden') {
+            saiuDaPaginaChromeIOS = true;
+            return;
+          }
+
+          if (saiuDaPaginaChromeIOS && location.pathname === '/go.html') {
             window.location.replace(appUrl);
           }
         });
