@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Querido Personal</title>
+<meta name="theme-color" content="#358888">
+<meta name="description" content="Querido Personal - treinos, aulas e alunos.">
+<link rel="icon" type="image/png" sizes="180x180" href="./icons/querido-personal-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/querido-personal-180.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#f9f9f9;color:#1e2935;font-family:Arial,sans-serif}
+body{min-height:100vh;display:grid;place-items:center;padding:20px}
+main{width:min(430px,100%);border:1px solid #dde2dc;background:#fff;border-radius:18px;text-align:center;padding:25px 20px}
+.logo{display:block;width:min(200px,55vw);height:auto;margin:0 auto 16px;border-radius:20px}
+h1{margin:0 0 8px;font-size:25px}p{line-height:1.5}
+.sub{margin:0 0 22px;font-size:13px;color:#6e7470}
+.guide{margin:0;text-align:left;background:#f0f8f7;border:1px solid #c9dedb;border-radius:12px;padding:13px;font-size:13px;line-height:1.6}
+.guide[hidden]{display:none}.guide p{margin:4px 0}
+a.open{display:block;background:#358888;color:#fff;text-decoration:none;border-radius:10px;padding:14px;margin-top:18px;font-size:14px;font-weight:bold}
+.note{font-size:11px;color:#6e7470;margin:12px 0 0}
+</style>
+<script>
+(function(){
+ var ua=navigator.userAgent||'';
+ var ios=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ var android=/Android/i.test(ua);
+ if(!ios&&!android) window.location.replace("https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec");
+})();
+document.addEventListener('DOMContentLoaded',function(){
+ var ua=navigator.userAgent||'';
+ var ios=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ var android=/Android/i.test(ua);
+ var chromeIOS=ios&&/CriOS/i.test(ua);
+ document.getElementById('iosGuide').hidden=!ios;
+ document.getElementById('androidGuide').hidden=!android;
+ if(ios||android) history.replaceState(null,'','./go.html');
+ if(android||chromeIOS){
+   var saiu=false;
+   var voltar=function(){if(saiu&&!document.hidden&&location.pathname==='/personal/go.html')window.location.replace("https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec");};
+   document.addEventListener('visibilitychange',function(){if(document.hidden)saiu=true;else voltar();});
+   if(android){
+     window.addEventListener('pageshow',voltar);
+     window.addEventListener('focus',voltar);
+     document.addEventListener('resume',voltar);
+     window.setInterval(voltar,500);
+   }
+ }
+ if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(function(){});
+});
+</script>
+</head>
+<body>
+<main>
+<img class="logo" src="./icons/querido-personal-512.png" width="200" height="200" alt="Logo do Querido Personal">
+<h1>Querido Personal</h1>
+<p class="sub">Treinos, aulas e alunos.</p>
+<section class="guide" id="iosGuide" hidden>
+<p>No <strong>Safari</strong>, toque em <strong>Compartilhar</strong> e <strong>Adicionar à Tela de Início</strong>.</p>
+<p>Desative <strong>Abrir como app web</strong>, quando essa opção aparecer. Confirme e abra o ícone criado.</p>
+</section>
+<section class="guide" id="androidGuide" hidden>
+<p>No <strong>Chrome</strong>, abra o menu <strong>⋮</strong> e escolha <strong>Adicionar à tela inicial</strong> ou <strong>Instalar app</strong>.</p>
+<p>Confirme e abra o ícone criado.</p>
+</section>
+<a class="open" href="./go.html">Abrir Querido Personal</a>
+<p class="note">O acesso e os dados continuam no aplicativo original.</p>
+</main>
+</body>
+</html>
