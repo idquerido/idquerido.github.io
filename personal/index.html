@@ -10,39 +10,19 @@
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/querido-personal-180.png?v=20261025">
 <link rel="manifest" href="./manifest.webmanifest?v=20261025">
 <style>
-:root{color-scheme:light;--ink:#192b38;--muted:#5e6c72;--accent:#358888;--accent-soft:#edf8f6;--border:#dce6e4}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f5f7f6;color:var(--ink)}
-body{display:flex;justify-content:center;align-items:flex-start;padding:22px 14px 44px}
-main{width:min(520px,100%);background:#fff;border:1px solid #e3e9e7;border-radius:22px;box-shadow:0 14px 50px rgba(24,46,54,.06);overflow:hidden}
-.hero{padding:24px 24px 19px;text-align:center}
-.logo{display:block;width:144px;height:144px;object-fit:cover;margin:0 auto 12px;border-radius:29px}
-.kicker{font-size:10px;letter-spacing:.16em;font-weight:800;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
-h1{font-size:26px;line-height:1.15;letter-spacing:-.025em;margin:0 0 8px}
-.sub{font-size:14px;line-height:1.5;margin:0;color:var(--muted)}
-.guide{padding:0 24px 4px}
-.guide[hidden],[hidden]{display:none!important}
-.guide-title{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-radius:12px;background:var(--accent-soft);border:1px solid #c8e4df;margin:0 0 16px}
-.guide-title h2{font-size:17px;margin:0;font-weight:800}
-.guide-title span{font-size:10px;font-weight:700;white-space:nowrap;letter-spacing:.07em;color:#2f7777;text-transform:uppercase}
-.intro{font-size:13px;line-height:1.55;color:var(--muted);margin:0 0 14px}
-.steps{list-style:none;margin:0;padding:0 2px}
-.steps li{display:flex;align-items:flex-start;gap:12px;padding:0 0 16px;position:relative}
-.steps li:not(:last-child):before{content:"";position:absolute;left:16px;top:33px;bottom:-1px;width:1px;background:#d4e7e4}
-.num{flex:0 0 33px;height:33px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:13px;line-height:33px;text-align:center;position:relative;z-index:1}
-.stepcopy{padding:2px 0 0;min-width:0}
-.stepcopy strong{font-size:14px;line-height:1.4;display:block}
-.stepcopy p{font-size:13px;color:var(--muted);line-height:1.5;margin:5px 0 0}
-.path{display:inline-block;background:#f0f3f4;border:1px solid #dfe5e6;border-radius:6px;padding:2px 6px;color:#233b42;font-weight:700;font-size:12px;line-height:1.6}
-.tip{display:flex;gap:10px;align-items:flex-start;background:#f6f8f7;border:1px solid #e1e9e7;border-radius:12px;padding:11px 12px;margin:0 0 15px;font-size:12px;line-height:1.55;color:#4d5d63}
-.tip strong{color:var(--ink)}
-.tip .emblem{flex:0 0 22px;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:#dfeeea;color:#276d6b;font-weight:800;font-size:12px}
-.guide-divider{height:1px;background:var(--border);margin:12px 24px 0}
-.actions{padding:18px 24px 24px}
-a.open{display:block;text-decoration:none;text-align:center;background:var(--accent);color:#fff;border-radius:12px;padding:14px 16px;font-size:14px;font-weight:800}
-a.open:focus-visible{outline:3px solid #104c55;outline-offset:3px}
-.note{text-align:center;color:#7b8589;font-size:11px;line-height:1.5;margin:12px 0 0}
-@media(max-width:380px){body{padding:8px 8px 22px}main{border-radius:17px}.hero{padding:18px 16px 15px}.logo{width:121px;height:121px}.guide{padding:0 16px 4px}.actions{padding:16px}.guide-divider{margin:10px 16px 0}}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f7f8f7;color:#1b2e39}
+body{min-height:100vh;display:grid;place-items:center;padding:20px 14px}
+main{width:min(420px,100%);border:1px solid #e0e7e5;border-radius:20px;background:#fff;padding:26px 24px 24px;box-shadow:0 8px 30px rgba(25,45,52,.05)}
+.logo{display:block;width:136px;height:136px;object-fit:cover;border-radius:27px;margin:0 auto 12px}
+h1{font-size:25px;line-height:1.2;margin:0;text-align:center}
+.subtitle{font-size:13px;color:#68777c;margin:7px 0 20px;text-align:center}
+.platform{padding:14px 0;border-top:1px solid #e5ebe9}
+.platform h2{font-size:15px;margin:0 0 7px;color:#247b79}
+.platform p{font-size:13px;line-height:1.55;color:#33434b;margin:0}
+a.open{display:block;background:#358888;color:#fff;text-decoration:none;text-align:center;font-size:14px;font-weight:700;padding:13px 10px;border-radius:10px;margin-top:17px}
+a.open:focus-visible{outline:3px solid #125558;outline-offset:2px}
+@media(max-width:375px){body{padding:12px}main{padding:19px 18px}.logo{width:114px;height:114px}.subtitle{margin-bottom:15px}.platform{padding:12px 0}}
 </style>
 <script>
 (function(){
@@ -56,8 +36,6 @@ document.addEventListener('DOMContentLoaded',function(){
  var ios=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
  var android=/Android/i.test(ua);
  var chromeIOS=ios&&/CriOS/i.test(ua);
- document.getElementById('iosGuide').hidden=!ios;
- document.getElementById('androidGuide').hidden=!android;
  if(ios||android) history.replaceState(null,'','./go.html');
  if(android||chromeIOS){
    var saiu=false;
@@ -76,37 +54,19 @@ document.addEventListener('DOMContentLoaded',function(){
 </head>
 <body>
 <main>
-<header class="hero">
-<img class="logo" src="./icons/querido-personal-512.png?v=20261025" width="144" height="144" alt="Ícone oficial do Querido Personal">
-<p class="kicker">Instalação no celular</p>
+<img class="logo" src="./icons/querido-personal-512.png?v=20261025" width="136" height="136" alt="Ícone oficial do Querido Personal">
 <h1>Querido Personal</h1>
-<p class="sub">Coloque o aplicativo na sua Tela de Início com a logo oficial.</p>
-</header>
-<section class="guide" id="iosGuide" hidden aria-label="Instalação no iPhone">
-<div class="guide-title"><h2>Como instalar no iPhone</h2><span>Safari</span></div>
-<ol class="steps">
-<li><span class="num" aria-hidden="true">1</span><div class="stepcopy"><strong>Abra esta página no Safari</strong><p>Se estiver dentro do ChatGPT, WhatsApp ou outro aplicativo, use <span class="path">Abrir no Safari</span> ou abra o link diretamente no Safari.</p></div></li>
-<li><span class="num" aria-hidden="true">2</span><div class="stepcopy"><strong>Toque em Compartilhar</strong><p>No Safari, use o ícone de compartilhar (quadrado com seta para cima).</p></div></li>
-<li><span class="num" aria-hidden="true">3</span><div class="stepcopy"><strong>Escolha <span class="path">Adicionar à Tela de Início</span></strong><p>Confira o nome <strong>Querido Personal</strong> e a imagem do atalho.</p></div></li>
-<li><span class="num" aria-hidden="true">4</span><div class="stepcopy"><strong>Desative <span class="path">Abrir como app web</span></strong><p>Para o atalho deste app, deixe essa opção desligada e toque em <span class="path">Adicionar</span>.</p></div></li>
-</ol>
-<div class="tip"><span class="emblem" aria-hidden="true">i</span><span>Depois, abra o ícone criado na Tela de Início. Se já tiver um atalho com a imagem antiga, remova-o e crie outro.</span></div>
+<p class="subtitle">Adicione o aplicativo à tela inicial</p>
+<section class="platform" aria-label="Apple iPhone">
+<h2>Apple (iPhone)</h2>
+<p>No Safari: <strong>Compartilhar → Adicionar à Tela de Início</strong>. Desative <strong>Abrir como app web</strong>.</p>
 </section>
-<section class="guide" id="androidGuide" hidden aria-label="Instalação no Android">
-<div class="guide-title"><h2>Como criar o atalho no Android</h2><span>Chrome</span></div>
-<ol class="steps">
-<li><span class="num" aria-hidden="true">1</span><div class="stepcopy"><strong>Abra esta página no Chrome</strong><p>Se estiver dentro do WhatsApp, ChatGPT ou outro aplicativo, escolha <span class="path">Abrir no Chrome</span> ou abra este endereço diretamente no Chrome.</p></div></li>
-<li><span class="num" aria-hidden="true">2</span><div class="stepcopy"><strong>Toque no menu <span class="path">⋮</span></strong><p>Procure <span class="path">Instalar e criar atalho</span> no menu do Chrome.</p></div></li>
-<li><span class="num" aria-hidden="true">3</span><div class="stepcopy"><strong>Escolha <span class="path">Criar atalho</span></strong><p>Para este aplicativo, prefira criar um atalho no Chrome, em vez de selecionar <span class="path">Instalar</span>, quando houver as duas opções.</p></div></li>
-<li><span class="num" aria-hidden="true">4</span><div class="stepcopy"><strong>Confirme em <span class="path">Adicionar</span></strong><p>Mantenha o nome <strong>Querido Personal</strong> e abra o ícone criado na Tela de Início.</p></div></li>
-</ol>
-<div class="tip"><span class="emblem" aria-hidden="true">i</span><span>O nome do menu pode variar conforme a versão do Chrome. Em alguns aparelhos aparece <strong>Adicionar à tela inicial</strong>. Verifique que o atalho abre o Querido Personal e não fica parado nesta página.</span></div>
+<section class="platform" aria-label="Android">
+<h2>Android</h2>
+<p>No Chrome: <strong>⋮ → Instalar e criar atalho → Criar atalho → Adicionar</strong>.</p>
+<p style="margin-top:5px;color:#728087;font-size:12px">Em algumas versões: “Adicionar à tela inicial”.</p>
 </section>
-<div class="guide-divider"></div>
-<div class="actions">
 <a class="open" href="./go.html">Abrir Querido Personal</a>
-<p class="note">Esta página serve para instalar o atalho. Seus dados e seu acesso continuam no aplicativo original.</p>
-</div>
 </main>
 </body>
 </html>
