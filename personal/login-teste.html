@@ -19,6 +19,9 @@ p{font-size:13px;line-height:1.55;color:#607075;margin:11px 0 0}
 #button{display:flex;align-items:center;justify-content:center;min-height:47px;margin:22px 0 16px}
 #status{font-size:13px;line-height:1.5;text-align:left;overflow-wrap:anywhere;color:#526468;background:#f0f8f7;border:1px solid #d9e9e5;border-radius:10px;padding:12px}
 .note{font-size:12px;margin-top:13px}
+#verifyForm{margin-top:14px}
+#verifyForm[hidden]{display:none}
+#verifyBtn{display:block;width:100%;background:#358888;color:#fff;border:0;border-radius:10px;font-weight:700;padding:14px 12px;font-size:15px;cursor:pointer}
 a{color:#297c78;text-decoration:none;font-size:13px;display:inline-block;margin-top:17px;font-weight:700}
 </style>
 </head>
@@ -29,7 +32,12 @@ a{color:#297c78;text-decoration:none;font-size:13px;display:inline-block;margin-
 <p>Verifique se a conta Google pode ser identificada com segurança pelo domínio do Querido Personal.</p>
 <div id="button" aria-label="Botão Entrar com Google"></div>
 <div id="status" role="status" aria-live="polite">Carregando identificação Google…</div>
-<p class="note">Teste isolado: não altera o login atual, não acessa a planilha e não autoriza o uso do aplicativo. A futura liberação exigirá validação da credencial no servidor e consulta à tb_USUARIO.</p>
+<form id="verifyForm" method="post" target="_blank" action="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec" hidden>
+  <input type="hidden" name="qp_google_acao" value="validar_login_google_teste">
+  <input type="hidden" id="googleCredential" name="qp_google_credencial" value="">
+  <button id="verifyBtn" type="submit">Verificar autorização no servidor</button>
+</form>
+<p class="note">Teste isolado: confirma a identidade no Google e verifica a autorização na tb_USUARIO. Não gera sessão nem libera acesso ao aplicativo. O login anterior continua ativo.</p>
 <a href="./">Voltar ao Querido Personal</a>
 </main>
 <script>
@@ -37,6 +45,17 @@ a{color:#297c78;text-decoration:none;font-size:13px;display:inline-block;margin-
 'use strict';
 var clientId='406584542773-g3c4kcl0avl04089qk62e37qtjffi2j5.apps.googleusercontent.com';
 var status=document.getElementById('status');
+var credential='';
+var verifyForm=document.getElementById('verifyForm');
+var credentialField=document.getElementById('googleCredential');
+verifyForm.addEventListener('submit',function(event){
+ if(!credential){event.preventDefault();say('Primeiro entre com o Google para receber uma identificação válida.');return;}
+ credentialField.value=credential;
+ credential='';
+ verifyForm.hidden=true;
+ say('A validação foi enviada ao servidor. Confira a nova aba do Safari para ver o resultado.');
+ setTimeout(function(){credentialField.value='';},1200);
+});
 function say(message){status.textContent=message;}
 function decodePayload(token){
  var part=String(token).split('.')[1];
@@ -63,7 +82,9 @@ function start(){
      if(payload.aud!==clientId){say('O Google retornou uma resposta para outro aplicativo.');return;}
      var email=String(payload.email||'');
      if(!email){say('A credencial foi recebida, mas não contém e-mail.');return;}
-     say('Identificação recebida do Google para '+email+'. Próxima etapa: verificar a credencial no servidor e conferir as permissões na tb_USUARIO.');
+     credential=response.credential;
+     verifyForm.hidden=false;
+     say('Identificação recebida para '+email+'. Toque no botão abaixo para verificar a autorização no servidor.');
     }catch(e){say('O Google respondeu, mas não foi possível interpretar os dados da conta.');}
    }
   });
