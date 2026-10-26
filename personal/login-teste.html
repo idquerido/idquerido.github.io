@@ -21,7 +21,7 @@ p{font-size:13px;line-height:1.55;color:#607075;margin:11px 0 0}
 .note{font-size:12px;margin-top:13px}
 #verifyForm{margin-top:14px}
 #verifyForm[hidden]{display:none}
-#verifyBtn{display:block;width:100%;background:#358888;color:#fff;border:0;border-radius:10px;font-weight:700;padding:14px 12px;font-size:15px;cursor:pointer}
+#openAppBtn,#verifyBtn{display:block;width:100%;border-radius:10px;font-weight:700;padding:14px 12px;font-size:15px;cursor:pointer}#openAppBtn{background:#358888;color:white;border:0}#verifyBtn{background:white;color:#358888;border:1px solid #358888;margin-top:10px}
 a{color:#297c78;text-decoration:none;font-size:13px;display:inline-block;margin-top:17px;font-weight:700}
 </style>
 </head>
@@ -33,11 +33,12 @@ a{color:#297c78;text-decoration:none;font-size:13px;display:inline-block;margin-
 <div id="button" aria-label="Botão Entrar com Google"></div>
 <div id="status" role="status" aria-live="polite">Carregando identificação Google…</div>
 <form id="verifyForm" method="post" target="_blank" action="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec" hidden>
-  <input type="hidden" name="qp_google_acao" value="validar_login_google_teste">
+  <input type="hidden" id="googleAction" name="qp_google_acao" value="abrir_app_google_teste">
   <input type="hidden" id="googleCredential" name="qp_google_credencial" value="">
+  <button id="openAppBtn" type="submit">Abrir Querido Personal (teste)</button>
   <button id="verifyBtn" type="submit">Verificar autorização no servidor</button>
 </form>
-<p class="note">Teste isolado: confirma a identidade no Google e verifica a autorização na tb_USUARIO. Não gera sessão nem libera acesso ao aplicativo. O login anterior continua ativo.</p>
+<p class="note">Teste de integração: a opção principal abre o aplicativo com uma sessão Google assinada pelo servidor. O login anterior por e-mail continua disponível. Não substitui ainda o acesso principal do atalho.</p>
 <a href="./">Voltar ao Querido Personal</a>
 </main>
 <script>
@@ -48,12 +49,15 @@ var status=document.getElementById('status');
 var credential='';
 var verifyForm=document.getElementById('verifyForm');
 var credentialField=document.getElementById('googleCredential');
+var actionField=document.getElementById('googleAction');
+document.getElementById('openAppBtn').addEventListener('click',function(){actionField.value='abrir_app_google_teste';});
+document.getElementById('verifyBtn').addEventListener('click',function(){actionField.value='validar_login_google_teste';});
 verifyForm.addEventListener('submit',function(event){
  if(!credential){event.preventDefault();say('Primeiro entre com o Google para receber uma identificação válida.');return;}
  credentialField.value=credential;
  credential='';
  verifyForm.hidden=true;
- say('A validação foi enviada ao servidor. Confira a nova aba do Safari para ver o resultado.');
+ say(actionField.value==='abrir_app_google_teste'?'Abrindo o aplicativo em uma nova aba. Confira se os dados e seu perfil foram carregados.':'Verificação enviada ao servidor. Confira o resultado na nova aba.');
  setTimeout(function(){credentialField.value='';},1200);
 });
 function say(message){status.textContent=message;}
@@ -84,7 +88,7 @@ function start(){
      if(!email){say('A credencial foi recebida, mas não contém e-mail.');return;}
      credential=response.credential;
      verifyForm.hidden=false;
-     say('Identificação recebida para '+email+'. Toque no botão abaixo para verificar a autorização no servidor.');
+     say('Identificação recebida para '+email+'. Use o botão principal para abrir o aplicativo com Google ou confira apenas a autorização no servidor.');
     }catch(e){say('O Google respondeu, mas não foi possível interpretar os dados da conta.');}
    }
   });
