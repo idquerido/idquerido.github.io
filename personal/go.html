@@ -22,6 +22,8 @@
     #googleButton{min-height:47px;display:flex;align-items:center;justify-content:center;margin:22px 0 0}
     #authStatus{min-height:22px;color:#52656a;font-size:12px;line-height:1.55;margin:12px 0 0}
     .secondary{display:block;border-radius:10px;border:1px solid #cdd8d4;background:#fff;color:#297b76;text-decoration:none;font-size:13px;font-weight:700;padding:13px;margin-top:12px}
+    #googleContinue[hidden]{display:none}
+    #googleContinue button{width:100%;cursor:pointer;font-family:inherit}
     .note{font-size:11px;margin-top:16px;color:#7a888b}
     .link{display:inline-block;margin-top:16px;color:#4d6670;font-size:12px;text-decoration:underline}
   </style>
@@ -33,6 +35,10 @@
     <p>Entre com a Conta Google cadastrada. O sistema verificará suas permissões automaticamente.</p>
     <div id="googleButton" aria-label="Entrar com Google"></div>
     <p id="authStatus" role="status" aria-live="polite">Preparando identificação Google…</p>
+    <div id="googleContinue" hidden>
+      <button class="secondary" id="continueGoogle" type="button">Continuar para o aplicativo</button>
+      <button class="secondary" id="restartGoogle" type="button">Identificar conta novamente</button>
+    </div>
     <a class="secondary" id="emailAccess" href="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec">Entrar com código por e-mail</a>
     <a class="link" href="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec">Já tenho uma sessão: abrir aplicativo</a>
     <p class="note">O Google identifica sua conta; o Querido Personal só libera usuários cadastrados e ativos. A base de dados permanece privada.</p>
@@ -49,6 +55,11 @@
     const status=document.getElementById('authStatus');
     const form=document.getElementById('googleForm');
     let sent=false,nonce='';
+    const followup=document.getElementById('googleContinue');
+    const retryButton=document.getElementById('continueGoogle');
+    const restartButton=document.getElementById('restartGoogle');
+    if(restartButton)restartButton.onclick=()=>window.location.reload();
+    if(retryButton)retryButton.onclick=()=>{say('Abrindo o Querido Personal a partir do seu toque…');if(form.requestSubmit)form.requestSubmit();else form.submit();};
     const say=s=>{status.textContent=s;};
     try {
       const rand=new Uint8Array(32);window.crypto.getRandomValues(rand);
@@ -64,7 +75,14 @@
       say('Conta identificada. Abrindo o Querido Personal…');
       document.getElementById('credential').value=response.credential;
       document.getElementById('nonce').value=nonce;
-      form.submit();
+      try{form.submit();}
+      catch(e){say('Não foi possível abrir o aplicativo automaticamente. Use o botão Continuar.');if(followup)followup.hidden=false;return;}
+      window.setTimeout(function(){
+        if(document.visibilityState!=='hidden'&&sent){
+          say('A conta foi identificada, mas a navegação ao aplicativo não terminou. Toque em Continuar ou identifique sua conta novamente.');
+          if(followup)followup.hidden=false;
+        }
+      },10000);
     }
     function start(){
       if(!window.google || !google.accounts || !google.accounts.id){
