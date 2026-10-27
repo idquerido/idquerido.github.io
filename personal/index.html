@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded',function(){
  if(ios||android) history.replaceState(null,'','./go.html');
  if(android||chromeIOS){
    var saiu=false;
-   var voltar=function(){if(saiu&&!document.hidden&&location.pathname==='/personal/go.html')window.location.replace("https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec");};
+   var voltar=function(){if(saiu&&!document.hidden&&location.pathname==='/personal/go.html')window.location.replace("https://idquerido.github.io/personal/go.html");};
    document.addEventListener('visibilitychange',function(){if(document.hidden)saiu=true;else voltar();});
    if(android){
      window.addEventListener('pageshow',voltar);
