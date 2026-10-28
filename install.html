@@ -7,27 +7,20 @@
   <meta name="theme-color" content="#358888">
   <link rel="icon" type="image/png" sizes="180x180" href="/icons/querido-hub-oficial-v2-180.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/querido-hub-oficial-v2-180.png">
-  <style>
-    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,sans-serif;background:#f5f5f5;color:#111}
-    body{display:grid;place-items:center;min-height:100vh;padding:24px}
-    main{width:min(430px,100%);background:#fff;border-radius:24px;padding:34px 28px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.08)}
-    img{width:128px;height:128px;border-radius:24px;display:block;margin:0 auto 18px}
-    h1{margin:0 0 14px;font-size:30px}
-    p{margin:8px 0;color:#555;line-height:1.45}
-    strong{color:#111}
-  </style>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta http-equiv="refresh" content="0;url=https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec">
   <script>
-    window.addEventListener('DOMContentLoaded', function () {
-      history.replaceState(null, '', '/go.html');
-    });
+    // A identidade e as permissões são validadas pelo backend do Hub.
+    // Não depender de navegador, criação de atalho ou eventos de retorno.
+    window.location.replace("https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec");
   </script>
+  <style>
+    html,body{margin:0;min-height:100%;background:#f5f5f5;color:#214747;font-family:Arial,sans-serif}
+    body{display:grid;place-items:center;min-height:100vh}
+    p{padding:24px;text-align:center}
+  </style>
 </head>
 <body>
-  <main>
-    <img src="/icons/querido-hub-oficial-v2-180.png" alt="Querido Hub">
-    <h1>Querido Hub</h1>
-    <p>Use <strong>Compartilhar → Adicionar à Tela de Início</strong>.</p>
-    <p>Na tela seguinte, <strong>desative “Abrir como app web”</strong> antes de adicionar.</p>
-  </main>
+  <p role="status">Conectando ao Querido Hub…</p>
 </body>
 </html>
