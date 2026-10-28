@@ -1,26 +1,40 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Querido Hub</title>
-  <meta name="theme-color" content="#358888">
-  <link rel="icon" type="image/png" sizes="180x180" href="/icons/querido-hub-oficial-v2-180.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/querido-hub-oficial-v2-180.png">
-  <link rel="manifest" href="/manifest.webmanifest">
-  <meta http-equiv="refresh" content="0;url=https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec">
-  <script>
-    // A identidade e as permissões são validadas pelo backend do Hub.
-    // Não depender de navegador, criação de atalho ou eventos de retorno.
-    window.location.replace("https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec");
-  </script>
-  <style>
-    html,body{margin:0;min-height:100%;background:#f5f5f5;color:#214747;font-family:Arial,sans-serif}
-    body{display:grid;place-items:center;min-height:100vh}
-    p{padding:24px;text-align:center}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Querido Hub</title>
+<meta name="theme-color" content="#358888">
+<meta name="apple-mobile-web-app-title" content="Querido Hub">
+<link rel="icon" type="image/png" href="https://idquerido.github.io/icons/querido-hub-oficial-v2-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://idquerido.github.io/icons/querido-hub-oficial-v2-180.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<script>
+(function () {
+  var standalone = navigator.standalone === true ||
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  if (standalone) {
+    window.location.replace('/go.html');
+    return;
+  }
+  // Preserva os metadados desta página durante a criação do ícone.
+  // O endereço salvo abre o encaminhador, não esta tela de instalação.
+  history.replaceState(null, '', '/go.html');
+})();
+</script>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#f5f5f5;font-family:Arial,sans-serif;color:#214747}
+main{width:100%;max-width:440px;background:white;border-radius:24px;padding:32px;text-align:center}
+img{width:128px;height:128px}h1{font-size:28px}p{line-height:1.6}
+</style>
 </head>
 <body>
-  <p role="status">Conectando ao Querido Hub…</p>
+<main>
+<img src="/icons/querido-hub-oficial-v2-180.png" alt="Logo do Querido Hub" width="128" height="128">
+<h1>Querido Hub</h1>
+<p>No iPhone, toque em <strong>Compartilhar → Adicionar à Tela de Início</strong>. Se a opção não aparecer no Chrome, abra este endereço no Safari.</p>
+<p>No Android, use o menu do navegador e escolha <strong>Adicionar à tela inicial</strong> ou <strong>Instalar app</strong>.</p>
+<p>Depois de adicionar, abra o novo ícone. O Hub seguirá automaticamente para a validação da sua conta Google.</p>
+</main>
 </body>
 </html>
