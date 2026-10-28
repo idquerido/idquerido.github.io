@@ -5,119 +5,22 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Querido Hub</title>
   <meta name="theme-color" content="#358888">
-
   <link rel="icon" type="image/png" sizes="180x180" href="/icons/querido-hub-oficial-v2-180.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/querido-hub-oficial-v2-180.png">
   <link rel="manifest" href="/manifest.webmanifest">
-
+  <meta http-equiv="refresh" content="0;url=https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec">
   <script>
-    (function () {
-      var ua = navigator.userAgent || '';
-      var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      var isAndroid = /Android/i.test(ua);
-
-      if (!isIOS && !isAndroid) {
-        window.location.replace("https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec");
-      }
-    })();
+    // A identidade e as permissões são validadas pelo backend do Hub.
+    // Não depender de navegador, criação de atalho ou eventos de retorno.
+    window.location.replace("https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec");
   </script>
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      min-height: 100%;
-      background: #f5f5f5;
-    }
-
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 0;
-    }
-
-    .guia {
-      display: block;
-      width: 100%;
-      max-width: 700px;
-      height: auto;
-      margin: 0 auto;
-    }
+    html,body{margin:0;min-height:100%;background:#f5f5f5;color:#214747;font-family:Arial,sans-serif}
+    body{display:grid;place-items:center;min-height:100vh}
+    p{padding:24px;text-align:center}
   </style>
-
-  <script>
-    window.addEventListener('DOMContentLoaded', function () {
-      var ua = navigator.userAgent || '';
-      var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      var isAndroid = /Android/i.test(ua);
-      var isChromeIOS = isIOS && /CriOS/i.test(ua);
-      var appUrl = "https://script.google.com/a/macros/conspira.com.br/s/AKfycbzEQ1GYz3dJAiIYUmfpp3pjLnEb3lfPVF0Yj6L8WsF7AnOiI5X1msK9pyJvo75R94kf/exec";
-
-      if (isIOS) {
-        history.replaceState(null, '', '/go.html');
-      }
-
-      if (isAndroid) {
-        history.replaceState(null, '', '/go.html');
-
-        var saiuDaPaginaAndroid = false;
-
-        function redirecionarAndroidSeRetornou() {
-          if (
-            saiuDaPaginaAndroid &&
-            !document.hidden &&
-            location.pathname === '/go.html'
-          ) {
-            window.location.replace(appUrl);
-          }
-        }
-
-        document.addEventListener('visibilitychange', function () {
-          if (document.visibilityState === 'hidden') {
-            saiuDaPaginaAndroid = true;
-            return;
-          }
-
-          redirecionarAndroidSeRetornou();
-        });
-
-        window.addEventListener('pageshow', redirecionarAndroidSeRetornou);
-        window.addEventListener('focus', redirecionarAndroidSeRetornou);
-        document.addEventListener('resume', redirecionarAndroidSeRetornou);
-
-        window.setInterval(redirecionarAndroidSeRetornou, 500);
-      }
-
-      if (isChromeIOS) {
-        var saiuDaPaginaChromeIOS = false;
-
-        document.addEventListener('visibilitychange', function () {
-          if (document.visibilityState === 'hidden') {
-            saiuDaPaginaChromeIOS = true;
-            return;
-          }
-
-          if (saiuDaPaginaChromeIOS && location.pathname === '/go.html') {
-            window.location.replace(appUrl);
-          }
-        });
-      }
-    });
-  </script>
 </head>
-
 <body>
-  <img
-    class="guia"
-    src="/guia-querido-hub.png"
-    alt="Querido Hub como APP"
-  >
+  <p role="status">Conectando ao Querido Hub…</p>
 </body>
 </html>
