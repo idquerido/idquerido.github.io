@@ -24,12 +24,17 @@
     .secondary{display:block;border-radius:10px;border:1px solid #cdd8d4;background:#fff;color:#297b76;text-decoration:none;font-size:13px;font-weight:700;padding:13px;margin-top:12px}
     #googleContinue[hidden]{display:none}
     #googleContinue button{width:100%;cursor:pointer;font-family:inherit}
+    [hidden]{display:none!important}
+    body.app-open{display:block;padding:0;height:100vh;height:100dvh;overflow:hidden}
+    #appFrame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#f6f7f5}
+    #frameHelp{position:fixed;z-index:10;top:8px;left:8px;right:8px;max-width:440px;margin:auto;padding:12px;background:#fff;border:1px solid #cdd8d4;border-radius:12px;box-shadow:0 4px 20px #0002;text-align:center;font-size:13px}
+    #frameHelp button,#frameHelp a{margin:8px 4px 0;display:inline-block;font:inherit;color:#297b76;background:#fff;border:1px solid #cdd8d4;border-radius:8px;padding:8px;text-decoration:none}
     .note{font-size:11px;margin-top:16px;color:#7a888b}
     .link{display:inline-block;margin-top:16px;color:#4d6670;font-size:12px;text-decoration:underline}
   </style>
 </head>
 <body>
-  <main>
+  <main id="loginPanel">
     <img src="./icons/querido-personal-512.png?v=20261028v5" alt="Logo oficial Querido Personal">
     <h1>Querido <span>Personal</span></h1>
     <p>Entre com a Conta Google cadastrada. O sistema verificará suas permissões automaticamente.</p>
@@ -40,13 +45,19 @@
       <button class="secondary" id="restartGoogle" type="button">Identificar conta novamente</button>
     </div>
     <a class="secondary" id="emailAccess" href="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec">Entrar com código por e-mail</a>
-    <a class="link" href="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec">Já tenho uma sessão: abrir aplicativo</a>
+    <a class="link" id="existingAccess" href="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec">Já tenho uma sessão: abrir aplicativo</a>
     <p class="note">O Google identifica sua conta; o Querido Personal só libera usuários cadastrados e ativos. A base de dados permanece privada.</p>
   </main>
-  <form id="googleForm" method="post" action="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec" hidden>
+  <iframe id="appFrame" name="qpAppFrame" title="Querido Personal" allow="fullscreen" hidden></iframe>
+  <div id="frameHelp" role="status" hidden>A abertura está demorando. Você pode tentar novamente pela entrada.
+    <br><button id="backToLogin" type="button">Voltar à entrada</button>
+    <a id="directAccess" href="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec">Abrir diretamente</a>
+  </div>
+  <form id="googleForm" target="qpAppFrame" method="post" action="https://script.google.com/macros/s/AKfycbyg5ltvSAE2CZER5KscV4hWIzUV-LJiaFqOookCSd7zFy9vsGM_gr9zLd8MBXMLl-dwOA/exec" hidden>
     <input type="hidden" name="qp_google_acao" value="entrar_google">
     <input type="hidden" name="qp_google_credencial" id="credential">
     <input type="hidden" name="qp_google_nonce" id="nonce">
+    <input type="hidden" name="qp_bridge" id="sessionBridge">
   </form>
   <script>
   (function(){
@@ -54,13 +65,64 @@
     const CLIENT_ID='406584542773-g3c4kcl0avl04089qk62e37qtjffi2j5.apps.googleusercontent.com';
     const status=document.getElementById('authStatus');
     const form=document.getElementById('googleForm');
-    let sent=false,nonce='';
+    let sent=false,nonce='',bridge='',source=null,sourceOrigin='',frameTimer=0,opened=false;
+    const APP_SESSION='QP_PERSONAL_SESSION';
+    const appFrame=document.getElementById('appFrame');
+    const loginPanel=document.getElementById('loginPanel');
+    const frameHelp=document.getElementById('frameHelp');
+    const validToken=t=>typeof t==='string'&&t.length<=3000&&/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(t);
+    const randomId=()=>{const bytes=new Uint8Array(32);window.crypto.getRandomValues(bytes);return Array.from(bytes,n=>n.toString(16).padStart(2,'0')).join('');};
     const followup=document.getElementById('googleContinue');
     const retryButton=document.getElementById('continueGoogle');
     const restartButton=document.getElementById('restartGoogle');
     if(restartButton)restartButton.onclick=()=>window.location.reload();
-    if(retryButton)retryButton.onclick=()=>{say('Abrindo o Querido Personal a partir do seu toque…');if(form.requestSubmit)form.requestSubmit();else form.submit();};
+    if(retryButton)retryButton.onclick=()=>{say('Abrindo o Querido Personal a partir do seu toque…');showFrame();if(form.requestSubmit)form.requestSubmit();else form.submit();};
     const say=s=>{status.textContent=s;};
+    function readSession(){
+      try{const saved=JSON.parse(localStorage.getItem(APP_SESSION)||'null');return saved&&validToken(saved.token)?saved:null;}catch(_e){return null;}
+    }
+    function clearSession(){try{localStorage.removeItem(APP_SESSION);}catch(_e){}}
+    function frameContains(candidate){
+      try{for(let depth=0;candidate&&depth<8;depth++){
+        if(candidate===appFrame.contentWindow)return true;
+        const parent=candidate.parent;if(parent===candidate)break;candidate=parent;
+      }}catch(_e){}return false;
+    }
+    window.addEventListener('message',event=>{
+      const m=event.data;
+      if(!opened||!m||m.app!=='QUERIDO_PERSONAL_SESSION'||m.bridge!==bridge
+          ||!/^https:\/\/[a-z0-9-]+-script\.googleusercontent\.com$/.test(event.origin)
+          ||!frameContains(event.source))return;
+      if(source&&(source!==event.source||sourceOrigin!==event.origin))return;
+      if(!['restore','save','clear'].includes(m.action)||typeof m.request!=='string')return;
+      source=event.source;sourceOrigin=event.origin;
+      window.clearTimeout(frameTimer);frameHelp.hidden=true;
+      loginPanel.hidden=true;appFrame.hidden=false;document.body.classList.add('app-open');
+      const reply={app:'QUERIDO_PERSONAL_SESSION',bridge,request:m.request};
+      if(m.action==='restore'){
+        const saved=readSession();reply.token=saved?saved.token:'';reply.email=saved?saved.email:'';
+      }else if(m.action==='save'){
+        if(!validToken(m.token)||typeof m.email!=='string'||m.email.length>320)return;
+        const value=JSON.stringify({token:m.token,email:m.email});
+        try{localStorage.setItem(APP_SESSION,value);reply.saved=localStorage.getItem(APP_SESSION)===value;}catch(_e){reply.saved=false;}
+      }else{clearSession();reply.cleared=true;}
+      event.source.postMessage(reply,event.origin);
+    });
+    function showFrame(){
+      bridge=randomId();source=null;sourceOrigin='';opened=true;
+      document.getElementById('sessionBridge').value=bridge;
+      loginPanel.hidden=true;appFrame.hidden=false;document.body.classList.add('app-open');
+      try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.cancel();}catch(_e){}
+      window.clearTimeout(frameTimer);frameTimer=window.setTimeout(()=>{if(opened&&!source)frameHelp.hidden=false;},20000);
+    }
+    function openExisting(event){
+      if(event)event.preventDefault();
+      showFrame();appFrame.src=form.action+'?qp_bridge='+bridge;
+    }
+    document.getElementById('backToLogin').onclick=()=>{window.location.href='./go.html?entrar=1';};
+    document.getElementById('existingAccess').onclick=openExisting;
+    document.getElementById('emailAccess').onclick=openExisting;
+
     try {
       const rand=new Uint8Array(32);window.crypto.getRandomValues(rand);
       nonce=Array.from(rand,n=>n.toString(16).padStart(2,'0')).join('');
@@ -75,11 +137,12 @@
       say('Conta identificada. Abrindo o Querido Personal…');
       document.getElementById('credential').value=response.credential;
       document.getElementById('nonce').value=nonce;
-      try{form.submit();}
-      catch(e){say('Não foi possível abrir o aplicativo automaticamente. Use o botão Continuar.');if(followup)followup.hidden=false;return;}
+      try{showFrame();form.submit();}
+      catch(e){say('Não foi possível abrir o aplicativo automaticamente. Use o botão Continuar.');loginPanel.hidden=false;appFrame.hidden=true;document.body.classList.remove('app-open');if(followup)followup.hidden=false;return;}
       window.setTimeout(function(){
-        if(document.visibilityState!=='hidden'&&sent){
+        if(document.visibilityState!=='hidden'&&sent&&!source){
           say('A conta foi identificada, mas a navegação ao aplicativo não terminou. Toque em Continuar ou identifique sua conta novamente.');
+          loginPanel.hidden=false;appFrame.hidden=true;document.body.classList.remove('app-open');
           if(followup)followup.hidden=false;
         }
       },10000);
@@ -106,8 +169,13 @@
         say('Escolha sua Conta Google para entrar.');
       } catch(e) {say('Nao foi possivel abrir o Google. Entre por e-mail.');}
     }
-    if(document.readyState==='complete')start();else window.addEventListener('load',start,{once:true});
+    const forceLogin=new URLSearchParams(window.location.search).get('entrar')==='1';
+    if(forceLogin){clearSession();window.history.replaceState(null,'',window.location.pathname);}
+    if(readSession()&&!forceLogin){
+      say('Recuperando sua sessão…');openExisting();
+    }else if(document.readyState==='complete')start();else window.addEventListener('load',start,{once:true});
   })();
   </script>
 </body>
 </html>
+
