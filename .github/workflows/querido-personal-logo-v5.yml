@@ -1,0 +1,97 @@
+name: Publicar logo V5 Querido Personal
+
+on:
+  push:
+    paths:
+      - .github/workflows/querido-personal-logo-v5.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: querido-personal-icons-v5
+  cancel-in-progress: false
+
+jobs:
+  update-icons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Obter repositorio e historico da arte aprovada
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preparar bibliotecas graficas
+        run: python -m pip install --quiet pillow numpy scipy
+      - name: Gerar icones mantendo a ilustracao aprovada sem redesenhar
+        shell: bash
+        run: |
+          set -euo pipefail
+          git show de2dcf948764d2c8364b6ad3102da0620198bdee:personal/icons/querido-personal-512.png > /tmp/qp-original-512.png
+          printf '%s  %s\n' "5f058e5941acf24d7239b05afa1f21f3edc8be0a3b679b16e68b908475588510" /tmp/qp-original-512.png | sha256sum --check -
+          python personal/icons/gerar_logo_v5.py \
+            --mode icons \
+            --source /tmp/qp-original-512.png \
+            --reference /tmp/qp-original-512.png \
+            --out personal/icons \
+            --expected-sha256 5f058e5941acf24d7239b05afa1f21f3edc8be0a3b679b16e68b908475588510
+      - name: Atualizar manifesto PWA e versoes do iPhone e Android
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, pathlib, re
+          from PIL import Image
+          root=pathlib.Path("personal")
+          for size in (180,192,512):
+              p=root/"icons"/f"querido-personal-{size}.png"
+              with Image.open(p) as im:
+                  assert im.size==(size,size) and im.mode in ("RGB","RGBA")
+          mask=root/"icons"/"querido-personal-maskable-512.png"
+          with Image.open(mask) as im:
+              assert im.size==(512,512) and im.mode in ("RGB","RGBA")
+          manifest=root/"manifest.webmanifest"
+          m=json.loads(manifest.read_text(encoding="utf-8"))
+          version="?v=20261028v5"
+          m["icons"]=[
+              {"src":"./icons/querido-personal-180.png"+version,"sizes":"180x180","type":"image/png","purpose":"any"},
+              {"src":"./icons/querido-personal-192.png"+version,"sizes":"192x192","type":"image/png","purpose":"any"},
+              {"src":"./icons/querido-personal-512.png"+version,"sizes":"512x512","type":"image/png","purpose":"any"},
+              {"src":"./icons/querido-personal-maskable-512.png"+version,"sizes":"512x512","type":"image/png","purpose":"maskable"},
+          ]
+          m["background_color"]="#D9EEEA"
+          manifest.write_text(json.dumps(m,ensure_ascii=False,separators=(",",":"))+"\n",encoding="utf-8")
+          changed=[]
+          for name in ("index.html","go.html","login-teste.html"):
+              file=root/name
+              html=file.read_text(encoding="utf-8")
+              replacement=re.sub(r'(querido-personal-(?:180|192|512|maskable-512)\.png)\?v=[A-Za-z0-9_.-]+',r'\1'+version,html)
+              replacement=re.sub(r'(manifest\.webmanifest)\?v=[A-Za-z0-9_.-]+',r'\1'+version, replacement)
+              if replacement!=html:
+                  file.write_text(replacement,encoding="utf-8")
+                  changed.append(name)
+          assert "index.html" in changed and "go.html" in changed,changed
+          print("REFERENCIAS_ATUALIZADAS",",".join(changed))
+          print("MANIFEST_V5_OK",len(m["icons"]))
+          PY
+      - name: Publicar apenas icones e referencias do Querido Personal
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add personal/icons/querido-personal-180.png \
+             personal/icons/querido-personal-192.png \
+             personal/icons/querido-personal-512.png \
+             personal/icons/querido-personal-maskable-512.png \
+             personal/manifest.webmanifest personal/index.html \
+             personal/go.html personal/login-teste.html
+          if git diff --cached --quiet; then
+              echo "Nenhuma mudanca; icones ja atualizados"
+          else
+              git commit -m "Atualiza icone Querido Personal para degrade suave V5"
+              git push
+          fi
