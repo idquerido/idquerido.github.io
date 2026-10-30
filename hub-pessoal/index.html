@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Querido Hub Pessoal</title>
+<meta name="theme-color" content="#358888">
+<meta name="description" content="Querido Hub Pessoal - seus aplicativos pessoais em um lugar.">
+<link rel="icon" type="image/png" sizes="180x180" href="./icons/querido-hub-pessoal-180.png?v=20261030v1">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/querido-hub-pessoal-180.png?v=20261030v1">
+<link rel="manifest" href="./manifest.webmanifest?v=20261030v1">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f7f8f7;color:#1b2e39}
+body{min-height:100vh;display:grid;place-items:center;padding:20px 14px}
+main{width:min(420px,100%);border:1px solid #e0e7e5;border-radius:20px;background:#fff;padding:26px 24px 24px;box-shadow:0 8px 30px rgba(25,45,52,.05)}
+.logo{display:block;width:136px;height:136px;object-fit:cover;border-radius:27px;margin:0 auto 12px}
+h1{font-size:25px;line-height:1.2;margin:0;text-align:center}
+.subtitle{font-size:13px;color:#68777c;margin:7px 0 20px;text-align:center}
+.platform{padding:14px 0;border-top:1px solid #e5ebe9}
+.platform h2{font-size:15px;margin:0 0 7px;color:#247b79}
+.platform p{font-size:13px;line-height:1.55;color:#33434b;margin:0}
+a.open{display:block;background:#358888;color:#fff;text-decoration:none;text-align:center;font-size:14px;font-weight:700;padding:13px 10px;border-radius:10px;margin-top:17px}
+a.open:focus-visible{outline:3px solid #125558;outline-offset:2px}
+@media(max-width:375px){body{padding:12px}main{padding:19px 18px}.logo{width:114px;height:114px}.subtitle{margin-bottom:15px}.platform{padding:12px 0}}
+</style>
+<script>
+(function(){
+ var ua=navigator.userAgent||'';
+ var ios=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ var android=/Android/i.test(ua);
+ if(!ios&&!android) window.location.replace("./go.html");
+})();
+document.addEventListener('DOMContentLoaded',function(){
+ var ua=navigator.userAgent||'';
+ var ios=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ var android=/Android/i.test(ua);
+ var chromeIOS=ios&&/CriOS/i.test(ua);
+ if(ios||android) history.replaceState(null,'','./go.html');
+ if(android||chromeIOS){
+   var saiu=false;
+   var voltar=function(){if(saiu&&!document.hidden&&location.pathname==='/hub-pessoal/go.html')window.location.replace("https://idquerido.github.io/hub-pessoal/go.html");};
+   document.addEventListener('visibilitychange',function(){if(document.hidden)saiu=true;else voltar();});
+   if(android){
+     window.addEventListener('pageshow',voltar);
+     window.addEventListener('focus',voltar);
+     document.addEventListener('resume',voltar);
+     window.setInterval(voltar,500);
+   }
+ }
+ if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(function(){});
+});
+</script>
+</head>
+<body>
+<main>
+<img class="logo" src="./icons/querido-hub-pessoal-512.png?v=20261030v1" width="136" height="136" alt="Ícone oficial do Querido Hub Pessoal">
+<h1>Querido Hub Pessoal</h1>
+<p class="subtitle">Adicione o aplicativo à tela inicial</p>
+<section class="platform" aria-label="Apple iPhone">
+<h2>Apple (iPhone)</h2>
+<p>No Safari: <strong>Compartilhar → Adicionar à Tela de Início</strong>. Desative <strong>Abrir como app web</strong>.</p>
+</section>
+<section class="platform" aria-label="Android">
+<h2>Android</h2>
+<p>No Chrome: <strong>⋮ → Instalar e criar atalho → Criar atalho → Adicionar</strong>.</p>
+<p style="margin-top:5px;color:#728087;font-size:12px">Em algumas versões: “Adicionar à tela inicial”.</p>
+</section>
+<a class="open" href="./go.html">Abrir Querido Hub Pessoal</a>
+</main>
+</body>
+</html>
