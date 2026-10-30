@@ -88,18 +88,84 @@
         const parent=candidate.parent;if(parent===candidate)break;candidate=parent;
       }}catch(_e){}return false;
     }
-    window.addEventListener('message',event=>{
+    // V42: cópias locais no domínio fixo da entrada, separadas por usuário.
+    let videoDbPromise;
+    function videoOwner(){
+      const saved=readSession();if(!saved)throw new Error('Entre novamente para acessar os vídeos salvos.');
+      try{const raw=saved.token.split('.')[0].replace(/-/g,'+').replace(/_/g,'/');const p=JSON.parse(atob(raw));if(typeof p.uid==='string'&&p.uid)return p.uid;}catch(_){}
+      throw new Error('Sessão local não identificada. Entre novamente.');
+    }
+    function openVideoDb(){
+      if(!videoDbPromise)videoDbPromise=new Promise((resolve,reject)=>{
+        const r=indexedDB.open('QP_PERSONAL_VIDEOS',1);
+        r.onupgradeneeded=()=>{r.result.createObjectStore('videos',{keyPath:'key'});r.result.createObjectStore('partes',{keyPath:['key','indice']});};
+        r.onerror=()=>reject(new Error('Não foi possível abrir os vídeos salvos neste celular.'));
+        r.onblocked=()=>reject(new Error('Feche as outras abas do Personal e tente novamente.'));
+        r.onsuccess=()=>{r.result.onversionchange=()=>{r.result.close();videoDbPromise=null;};resolve(r.result);};
+      }).catch(e=>{videoDbPromise=null;throw e;});return videoDbPromise;
+    }
+    function checkVideoKey(key,owner){
+      if(typeof key!=='string'||key.length>700)throw new Error('Referência de vídeo inválida.');
+      const pieces=key.split('|');
+      if(pieces.length!==3||pieces[0]!==encodeURIComponent(owner)||!pieces[1]||!pieces[2])throw new Error('Vídeo de outro usuário.');
+      return pieces;
+    }
+    async function handleVideoStore(m){
+      const owner=videoOwner();if(m.owner!==owner)throw new Error('Vídeo de outro usuário.');
+      if(m.op==='probe'){await openVideoDb();return {available:true};}
+      if(m.op==='persist'){
+        return {persistent:!!(navigator.storage&&navigator.storage.persist&&await navigator.storage.persist())};
+      }
+      if(m.op==='estimate')return navigator.storage&&navigator.storage.estimate?await navigator.storage.estimate():{};
+      if(m.op==='delete'){
+        checkVideoKey(m.key,owner);const db=await openVideoDb();
+        return new Promise((resolve,reject)=>{const tx=db.transaction(['videos','partes'],'readwrite');
+          tx.objectStore('videos').delete(m.key);tx.objectStore('partes').delete(IDBKeyRange.bound([m.key,0],[m.key,Number.MAX_SAFE_INTEGER]));
+          tx.oncomplete=()=>resolve(true);tx.onabort=tx.onerror=()=>reject(new Error('Não foi possível remover a cópia deste celular.'));
+        });
+      }
+      if(!['videos','partes'].includes(m.store)||!['get','getAll','put'].includes(m.op))throw new Error('Operação local inválida.');
+      let arg=m.arg;
+      if(m.op==='put'){
+        if(!arg||typeof arg!=='object')throw new Error('Vídeo inválido.');
+        const pieces=checkVideoKey(arg.key,owner);
+        if(m.store==='videos'){
+          if(arg.owner!==owner||encodeURIComponent(String(arg.pid))!==pieces[1]||encodeURIComponent(String(arg.idArquivo))!==pieces[2]
+             ||!arg.completo||!Number.isSafeInteger(arg.tamanho)||arg.tamanho<1||arg.tamanho>250*1024*1024
+             ||!Number.isSafeInteger(arg.partes)||arg.partes<1)throw new Error('Registro de vídeo inválido.');
+        }else if(!Number.isSafeInteger(arg.indice)||arg.indice<0||!(arg.bytes instanceof ArrayBuffer)||arg.bytes.byteLength>4*1024*1024
+                  ||arg.bytes.byteLength<1||!/^[a-f0-9]{64}$/.test(arg.sha256||''))throw new Error('Bloco de vídeo inválido.');
+      }else if(m.store==='partes'){
+        if(m.op==='get'){if(!Array.isArray(arg)||arg.length!==2||!Number.isSafeInteger(arg[1])||arg[1]<0)throw new Error('Bloco inválido.');checkVideoKey(arg[0],owner);}
+        else{
+          if(!arg||!arg.range||!Array.isArray(arg.lower)||!Array.isArray(arg.upper)||arg.lower[0]!==arg.upper[0]
+             ||arg.lower[1]!==0||arg.upper[1]!==Number.MAX_SAFE_INTEGER)throw new Error('Intervalo inválido.');
+          checkVideoKey(arg.lower[0],owner);arg=IDBKeyRange.bound(arg.lower,arg.upper);
+        }
+      }else if(m.op==='get')checkVideoKey(arg,owner);
+      else if(arg!==undefined&&arg!==null)throw new Error('Consulta local inválida.');
+      const db=await openVideoDb();return new Promise((resolve,reject)=>{
+        const tx=db.transaction(m.store,m.op==='put'?'readwrite':'readonly'),r=tx.objectStore(m.store)[m.op](arg);let result;
+        r.onsuccess=()=>{result=r.result;};
+        tx.oncomplete=()=>resolve(m.store==='videos'&&m.op==='getAll'?(result||[]).filter(x=>x.owner===owner):result);
+        tx.onabort=tx.onerror=()=>reject(new Error(tx.error&&tx.error.name==='QuotaExceededError'?'Sem espaço para salvar este vídeo.':'Não foi possível acessar os vídeos salvos neste celular.'));
+      });
+    }
+
+    window.addEventListener('message',async event=>{
       const m=event.data;
       if(!opened||!m||m.app!=='QUERIDO_PERSONAL_SESSION'||m.bridge!==bridge
           ||!/^https:\/\/[a-z0-9-]+-script\.googleusercontent\.com$/.test(event.origin)
           ||!frameContains(event.source))return;
       if(source&&(source!==event.source||sourceOrigin!==event.origin))return;
-      if(!['restore','save','clear'].includes(m.action)||typeof m.request!=='string')return;
+      if(!['restore','save','clear','videoStore'].includes(m.action)||typeof m.request!=='string')return;
       source=event.source;sourceOrigin=event.origin;
       window.clearTimeout(frameTimer);frameHelp.hidden=true;
       loginPanel.hidden=true;appFrame.hidden=false;document.body.classList.add('app-open');
       const reply={app:'QUERIDO_PERSONAL_SESSION',bridge,request:m.request};
-      if(m.action==='restore'){
+      if(m.action==='videoStore'){
+        try{reply.result=await handleVideoStore(m);reply.ok=true;}catch(e){reply.ok=false;reply.error=e.message||'Falha no armazenamento local.';}
+      }else if(m.action==='restore'){
         const saved=readSession();reply.token=saved?saved.token:'';reply.email=saved?saved.email:'';
       }else if(m.action==='save'){
         if(!validToken(m.token)||typeof m.email!=='string'||m.email.length>320)return;
@@ -178,4 +244,5 @@
   </script>
 </body>
 </html>
+
 
