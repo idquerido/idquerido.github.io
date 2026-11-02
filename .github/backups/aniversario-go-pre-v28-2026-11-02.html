@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#358888"><meta name="referrer" content="no-referrer">
+<title>Entrar — Querido Aniversário</title>
+<link rel="icon" type="image/png" sizes="180x180" href="./icons/querido-aniversario-180.png?v=20261029v1">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/querido-aniversario-180.png?v=20261029v1">
+<link rel="manifest" href="./manifest.webmanifest?v=20261029v1">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f7f9f8;color:#23383b}
+body{min-height:100vh;display:grid;place-items:center;padding:18px}main{width:min(100%,400px);padding:24px;border:1px solid #d5dfdc;border-radius:17px;background:white;text-align:center}
+main img{width:100px;height:100px;border-radius:22px;display:block;margin:0 auto 13px}h1{font-size:23px;margin:0}h1 span{color:#358888}p{font-size:13px;color:#62716e;line-height:1.5}
+#googleButton{display:flex;justify-content:center;margin:20px auto 12px;min-height:44px}#googleContinue button{width:100%;cursor:pointer;font-family:inherit}#googleContinue[hidden]{display:none}#frameHelp{position:fixed;z-index:20;top:8px;left:8px;right:8px;max-width:430px;margin:auto;padding:15px;background:white;border:1px solid #cdd8d4;border-radius:12px;box-shadow:0 4px 18px #0002;text-align:center;font-size:13px}#frameHelp a,#frameHelp button{display:inline-block;margin:8px 3px 0;padding:9px;color:#287c77;background:#fff;border:1px solid #cbdcd8;border-radius:8px;font-size:13px;text-decoration:none;cursor:pointer}.secondary{display:block;margin-top:12px;border:1px solid #cbdcd8;border-radius:8px;padding:12px;text-decoration:none;color:#287c77;font-weight:700;font-size:13px}
+[hidden]{display:none!important}body.app-open{display:block;padding:0;overflow:hidden;height:100vh;height:100dvh}#appFrame{position:fixed;inset:0;border:0;width:100%;height:100%;background:#f7f9f8}
+</style></head>
+<body><main id="loginPanel"><img src="./icons/querido-aniversario-180.png?v=20261029v1" alt="Querido Aniversário"><h1>Querido <span>Aniversário</span></h1>
+<p>Entre com sua Conta Google cadastrada ou receba um código por e-mail.</p><div id="googleButton"></div>
+<p id="authStatus" role="status" aria-live="polite">Preparando identificação Google...</p>
+<div id="googleContinue" hidden><button class="secondary" type="button" id="continueGoogle">Continuar para o aplicativo</button><button class="secondary" type="button" id="restartGoogle">Identificar conta novamente</button></div>
+<a class="secondary" id="emailAccess" href="https://script.google.com/macros/s/AKfycbx964FLq7vfSeySVs2AF8pY2GwjqVjC6_F1Rnr23BtrnKX2CORYN_xLJDrPNl05UsqZOQ/exec">Entrar por código de e-mail</a>
+<button class="secondary" type="button" id="existingAccess" style="width:100%;background:white;cursor:pointer">Já tenho acesso: abrir o aplicativo</button>
+<p>Somente usuários cadastrados e ativos conseguem acessar a área interna.</p></main>
+<iframe id="appFrame" name="qaAppFrame" title="Querido Aniversário" hidden></iframe>
+<div id="frameHelp" hidden>O acesso está demorando mais do que o esperado. Tente novamente. <br><button id="backToLogin" type="button">Voltar à entrada</button><a id="directAccess" href="https://script.google.com/macros/s/AKfycbx964FLq7vfSeySVs2AF8pY2GwjqVjC6_F1Rnr23BtrnKX2CORYN_xLJDrPNl05UsqZOQ/exec">Entrar por código de e-mail</a></div>
+<form id="googleForm" target="qaAppFrame" method="post" action="https://script.google.com/macros/s/AKfycbx964FLq7vfSeySVs2AF8pY2GwjqVjC6_F1Rnr23BtrnKX2CORYN_xLJDrPNl05UsqZOQ/exec" hidden>
+<input type="hidden" name="qa_google_acao" value="entrar_google"><input type="hidden" name="qa_google_credencial" id="credential"><input type="hidden" name="qa_google_nonce" id="nonce"><input type="hidden" name="qa_bridge" id="bridge">
+</form>
+<script>
+(function(){'use strict';
+const CLIENT_ID='406584542773-g3c4kcl0avl04089qk62e37qtjffi2j5.apps.googleusercontent.com';
+const app='https://script.google.com/macros/s/AKfycbx964FLq7vfSeySVs2AF8pY2GwjqVjC6_F1Rnr23BtrnKX2CORYN_xLJDrPNl05UsqZOQ/exec';
+const status=document.getElementById('authStatus'),frame=document.getElementById('appFrame'),panel=document.getElementById('loginPanel'),form=document.getElementById('googleForm');
+const STORAGE='QA_ANIVERSARIO_SESSION_V27';let nonce='',bridge='',opened=false,source=null,sourceOrigin='',sent=false,frameTimer=0;
+const frameHelp=document.getElementById('frameHelp'),followup=document.getElementById('googleContinue');
+const validToken=s=>typeof s==='string'&&s.length<=3000&&/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(s);
+const randomId=()=>{const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);return Array.from(bytes,x=>x.toString(16).padStart(2,'0')).join('');};
+function session(){try{const x=JSON.parse(localStorage.getItem(STORAGE)||'null');return x&&validToken(x.token)?x:null;}catch(e){return null;}}
+function clear(){try{localStorage.removeItem(STORAGE);}catch(e){}}
+function frameContains(w){try{for(let i=0;i<8&&w;i++){if(w===frame.contentWindow)return true;const p=w.parent;if(p===w)break;w=p;}}catch(e){}return false;}
+function showFrame(){bridge=randomId();source=null;sourceOrigin='';opened=true;document.getElementById('bridge').value=bridge;panel.hidden=true;frame.hidden=false;document.body.classList.add('app-open');frameHelp.hidden=true;window.clearTimeout(frameTimer);frameTimer=window.setTimeout(()=>{if(opened&&!source)frameHelp.hidden=false;},20000);try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.cancel();}catch(e){}}
+window.addEventListener('message',event=>{
+ const m=event.data;if(!opened||!m||m.app!=='QUERIDO_ANIVERSARIO_SESSION'||m.bridge!==bridge||!/^(https:\/\/[a-z0-9-]+-script\.googleusercontent\.com)$/.test(event.origin)||!frameContains(event.source))return;
+ if(source&&(source!==event.source||sourceOrigin!==event.origin))return;
+ if(!['restore','save','clear'].includes(m.action)||typeof m.request!=='string')return;
+ source=event.source;sourceOrigin=event.origin;window.clearTimeout(frameTimer);frameHelp.hidden=true;
+ const reply={app:'QUERIDO_ANIVERSARIO_SESSION',bridge,request:m.request};
+ if(m.action==='restore'){const s=session();reply.token=s?s.token:'';reply.email=s?s.email:'';}
+ else if(m.action==='save'){if(!validToken(m.token)||typeof m.email!=='string'||m.email.length>254)return;try{localStorage.setItem(STORAGE,JSON.stringify({token:m.token,email:m.email}));reply.saved=true;}catch(e){reply.saved=false;}}
+ else{clear();reply.cleared=true;}
+ event.source.postMessage(reply,event.origin);
+});
+document.getElementById('existingAccess').onclick=()=>{showFrame();frame.src=app+'?qa_bridge='+bridge;};
+document.getElementById('backToLogin').onclick=()=>{window.location.href='./go.html?entrar=1';};
+document.getElementById('restartGoogle').onclick=()=>window.location.reload();
+document.getElementById('continueGoogle').onclick=()=>{status.textContent='Abrindo o Querido Aniversário...';showFrame();try{if(form.requestSubmit)form.requestSubmit();else form.submit();}catch(e){frameHelp.hidden=false;}};
+// E-mail is an alternative from any provider; the server validates the registered account.
+document.getElementById('emailAccess').onclick=e=>{e.preventDefault();showFrame();frame.src=app+'?qa_bridge='+bridge;};
+try{nonce=randomId();document.getElementById('nonce').value=nonce;}catch(e){status.textContent='Identificação indisponível neste navegador. Entre por e-mail.';return;}
+function credential(c){
+ if(sent)return;
+ if(!c||!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(c.credential||'')){status.textContent='Conta não identificada. Tente novamente ou entre por e-mail.';return;}
+ sent=true;status.textContent='Conta identificada. Abrindo o Querido Aniversário...';document.getElementById('credential').value=c.credential;showFrame();
+ try{form.submit();}catch(e){status.textContent='Não foi possível abrir automaticamente. Toque em Continuar.';panel.hidden=false;frame.hidden=true;document.body.classList.remove('app-open');followup.hidden=false;return;}
+ window.setTimeout(()=>{if(document.visibilityState!=='hidden'&&sent&&!source){status.textContent='A conta foi identificada, mas o aplicativo não terminou de abrir. Toque em Continuar ou escolha outra conta.';panel.hidden=false;frame.hidden=true;document.body.classList.remove('app-open');followup.hidden=false;}},10000);
+ }
+function start(){if(!(window.google&&google.accounts&&google.accounts.id)){status.textContent='O Google está indisponível. Entre por e-mail.';return;}try{google.accounts.id.initialize({client_id:CLIENT_ID,callback:credential,nonce,auto_select:true,ux_mode:'popup',use_fedcm_for_prompt:true,itp_support:true,context:'signin'});google.accounts.id.renderButton(document.getElementById('googleButton'),{type:'standard',theme:'outline',size:'large',shape:'rectangular',text:'signin_with',width:300});google.accounts.id.prompt();status.textContent='Escolha sua Conta Google para entrar.';}catch(e){status.textContent='Não foi possível iniciar o Google. Entre por e-mail.';}}
+const forceLogin=new URLSearchParams(location.search).get('entrar')==='1';
+if(forceLogin){clear();window.history.replaceState(null,'',window.location.pathname);}
+if(session()&&!forceLogin){status.textContent='Recuperando sua sessão...';showFrame();frame.src=app+'?qa_bridge='+bridge;}
+else if(document.readyState==='complete')start();else window.addEventListener('load',start,{once:true});
+})();
+</script></body></html>
