@@ -43,20 +43,24 @@ function showFrame(){bridge=randomId();source=null;sourceOrigin='';opened=true;d
 window.addEventListener('message',event=>{
  const m=event.data;if(!opened||!m||m.app!=='QUERIDO_ANIVERSARIO_SESSION'||m.bridge!==bridge||!/^(https:\/\/[a-z0-9-]+-script\.googleusercontent\.com)$/.test(event.origin)||!frameContains(event.source))return;
  if(source&&(source!==event.source||sourceOrigin!==event.origin))return;
- if(!['restore','save','clear'].includes(m.action)||typeof m.request!=='string')return;
- source=event.source;sourceOrigin=event.origin;window.clearTimeout(frameTimer);frameHelp.hidden=true;
+ if(!['restore','save','clear','needLogin'].includes(m.action)||typeof m.request!=='string')return;
+ if(m.action==='needLogin'){
+    clear();window.location.replace('./go.html?entrar=1');return;
+  }
+  source=event.source;sourceOrigin=event.origin;window.clearTimeout(frameTimer);frameHelp.hidden=true;
  const reply={app:'QUERIDO_ANIVERSARIO_SESSION',bridge,request:m.request};
  if(m.action==='restore'){const s=session();reply.token=s?s.token:'';reply.email=s?s.email:'';}
  else if(m.action==='save'){if(!validToken(m.token)||typeof m.email!=='string'||m.email.length>254)return;try{localStorage.setItem(STORAGE,JSON.stringify({token:m.token,email:m.email}));reply.saved=true;}catch(e){reply.saved=false;}}
  else{clear();reply.cleared=true;}
  event.source.postMessage(reply,event.origin);
+  if(m.action==='clear'&&m.logout===true)window.location.replace('./go.html?entrar=1');
 });
 document.getElementById('existingAccess').onclick=()=>{showFrame();frame.src=app+'?qa_bridge='+bridge;};
 document.getElementById('backToLogin').onclick=()=>{window.location.href='./go.html?entrar=1';};
 document.getElementById('restartGoogle').onclick=()=>window.location.reload();
 document.getElementById('continueGoogle').onclick=()=>{status.textContent='Abrindo o Querido Aniversário...';showFrame();try{if(form.requestSubmit)form.requestSubmit();else form.submit();}catch(e){frameHelp.hidden=false;}};
 // E-mail is an alternative from any provider; the server validates the registered account.
-document.getElementById('emailAccess').onclick=e=>{e.preventDefault();showFrame();frame.src=app+'?qa_bridge='+bridge;};
+document.getElementById('emailAccess').onclick=e=>{e.preventDefault();showFrame();frame.src=app+'?qa_bridge='+bridge+'&qa_email=1';};
 try{nonce=randomId();document.getElementById('nonce').value=nonce;}catch(e){status.textContent='Identificação indisponível neste navegador. Entre por e-mail.';return;}
 function credential(c){
  if(sent)return;
