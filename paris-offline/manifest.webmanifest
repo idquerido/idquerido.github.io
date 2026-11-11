@@ -1,0 +1,15 @@
+{
+  "id": "/paris-offline/",
+  "name": "PARIS — Consulta offline",
+  "short_name": "PARIS Offline",
+  "description": "Consulta manual de copias locais do PARIS, sem sincronizacao automatica",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f9f8",
+  "theme_color": "#358888",
+  "lang": "pt-BR",
+  "icons": [
+    {"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
