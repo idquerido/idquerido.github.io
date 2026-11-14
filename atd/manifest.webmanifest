@@ -1,0 +1,16 @@
+{
+  "id": "/atd/",
+  "name": "ATD | Gestão financeira",
+  "short_name": "ATD | Gestão financeira",
+  "lang": "pt-BR",
+  "start_url": "./go.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F9F9F9",
+  "theme_color": "#358888",
+  "icons": [
+    {"src": "../icons/atd-oficial-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any"},
+    {"src": "../icons/atd-oficial-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "../icons/atd-oficial-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>ATD | Gestão financeira</title>
+  <meta name="description" content="Instale o atalho do ATD | Gestão financeira.">
+  <meta name="theme-color" content="#358888">
+  <meta name="apple-mobile-web-app-title" content="ATD | Gestão financeira">
+  <link rel="icon" type="image/png" sizes="180x180" href="../icons/atd-oficial-180.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../icons/atd-oficial-180.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#F9F9F9;color:#263B37;font-family:Arial,sans-serif}body{min-height:100vh;display:grid;place-items:center;padding:24px 16px}main{width:min(440px,100%);padding:28px 24px;border:1px solid #DFE7E3;border-radius:20px;background:#FFF}.logo{display:block;width:128px;height:128px;object-fit:contain;margin:0 auto 20px}h1{margin:0 0 22px;font-size:23px;text-align:center}h2{margin:0 0 8px;font-size:15px;color:#358888}section{padding:16px 0;border-top:1px solid #E4E9E6}p{margin:0;font-size:14px;line-height:1.65}.open{display:block;margin-top:16px;padding:14px 12px;border-radius:10px;background:#358888;color:white;text-decoration:none;text-align:center;font-weight:700}.open:focus-visible{outline:3px solid #1A5555;outline-offset:3px}
+  </style>
+  <script>
+    (()=>{
+      const installed=navigator.standalone===true||(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches);
+      if(installed){window.location.replace('./go.html');return;}
+      // Mantem a logo e o nome durante a instalacao e salva o endereco do encaminhador.
+      history.replaceState(null,'','./go.html');
+    })();
+  </script>
+</head>
+<body>
+  <main>
+    <img class="logo" src="../icons/atd-oficial-180.png" width="128" height="128" alt="Logo A Torcida Delas">
+    <h1>ATD | Gestão financeira</h1>
+    <section aria-label="Instalação no iPhone">
+      <h2>iPhone</h2>
+      <p>No Safari, toque em <strong>Compartilhar → Adicionar à Tela de Início</strong>. Desative <strong>Abrir como app web</strong> e toque em <strong>Adicionar</strong>.</p>
+    </section>
+    <section aria-label="Instalação no Android">
+      <h2>Android</h2>
+      <p>No Chrome, abra o menu <strong>⋮</strong> e escolha <strong>Adicionar à tela inicial</strong> ou <strong>Criar atalho</strong>.</p>
+    </section>
+    <a class="open" href="./go.html">Abrir ATD</a>
+  </main>
+</body>
+</html>
