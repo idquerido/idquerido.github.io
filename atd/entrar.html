@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#358888">
+<title>Entrar — ATD | Gestão financeira</title><link rel="icon" href="../icons/atd-oficial-180.png"><script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:#F9F9F9;color:#263B37;font:14px Arial,sans-serif}main{width:min(410px,100%);padding:28px 24px;background:#FFF;border:1px solid #DAE5E1;border-radius:16px;text-align:center}img{width:96px;height:96px;object-fit:contain}h1{font-size:23px;margin:20px 0 10px}p{line-height:1.6;color:#657870}#googleButton{display:flex;justify-content:center;min-height:44px;margin:22px 0 10px}#status{font-size:13px;min-height:24px}</style>
+</head><body><main><img src="../icons/atd-oficial-180.png" alt="A Torcida Delas"><h1>Gestão financeira</h1><p>Entre com a Conta Google cadastrada no Hub.</p><div id="googleButton"></div><p id="status" role="status" aria-live="polite">Preparando identificação Google...</p></main>
+<script>
+(()=>{'use strict';
+ const fields=new URLSearchParams(location.hash.slice(1)),nonce=fields.get('nonce')||'',origin=fields.get('origin')||'',status=document.getElementById('status');let sent=false;
+ const valid=/^[a-f0-9]{64}$/.test(nonce)&&/^https:\/\/[a-z0-9-]+-script\.googleusercontent\.com$/.test(origin)&&!!window.opener;
+ history.replaceState(null,'',location.pathname);
+ if(!valid){status.textContent='Abra esta identificação pelo botão Entrar com Google no ATD.';return;}
+ function receive(response){
+  if(sent||!response||typeof response.credential!=='string'||response.credential.length>12000||!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(response.credential))return;
+  if(!window.opener||window.opener.closed){status.textContent='A janela do ATD foi fechada. Abra o aplicativo novamente.';return;}
+  sent=true;status.textContent='Validando sua permissão no ATD...';
+  window.opener.postMessage({type:'ATD_GOOGLE_CREDENTIAL',nonce,credential:response.credential},origin);
+ }
+ function start(){
+  if(!window.google?.accounts?.id){status.textContent='A identificação Google não carregou. Feche esta janela e tente novamente pelo ATD.';return;}
+  google.accounts.id.initialize({client_id:'406584542773-g3c4kcl0avl04089qk62e37qtjffi2j5.apps.googleusercontent.com',callback:receive,nonce,auto_select:false,ux_mode:'popup',context:'signin',itp_support:true});
+  google.accounts.id.renderButton(document.getElementById('googleButton'),{type:'standard',theme:'outline',size:'large',shape:'rectangular',text:'signin_with',width:300});
+  status.textContent='Escolha a Conta Google liberada no Hub.';
+ }
+ window.addEventListener('load',start,{once:true});
+})();
+</script></body></html>
